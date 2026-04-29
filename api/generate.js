@@ -16,8 +16,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 8000,
+        model: 'claude-sonnet-4-5',        max_tokens: 8000,
         system: "You are an expert Philippine lawyer with 20 years of litigation experience. Draft complete, formal, legally sound Philippine legal documents. Always include all sections and never cut off. Output only the document itself.",
         messages: req.body.messages || [{ role: "user", content: "Hello" }]
       })
