@@ -1,182 +1,263 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>LexDraft PH – AI Legal Document Generator</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0d1b2a; font-family: Georgia, 'Times New Roman', serif; color: #e8dcc8; min-height: 100vh; }
-.header { background: linear-gradient(135deg, #0d1b2a 0%, #1a3a5c 50%, #0d1b2a 100%); border-bottom: 1px solid #c8a96e33; padding: 0 2rem; }
-.header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 0 0.8rem; }
-.logo { display: flex; align-items: center; gap: 0.75rem; }
-.logo-icon { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #c8a96e, #e8c97e); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; color: #0d1b2a; }
-.logo-name { font-size: 1.15rem; font-weight: bold; color: #c8a96e; letter-spacing: 0.05em; }
-.logo-sub { font-size: 0.65rem; color: #8aa0b8; letter-spacing: 0.12em; text-transform: uppercase; }
-.nav { display: flex; gap: 0.25rem; }
-.nav-btn { background: transparent; color: #8aa0b8; border: 1px solid #2a4a6a; border-radius: 6px; padding: 0.4rem 1rem; cursor: pointer; font-size: 0.8rem; font-family: inherit; text-transform: capitalize; letter-spacing: 0.05em; transition: all 0.2s; }
-.nav-btn.active { background: #c8a96e; color: #0d1b2a; border-color: #c8a96e; }
-.main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
-.subtitle { text-align: center; margin-bottom: 2rem; }
-.subtitle-tag { font-size: 0.75rem; color: #c8a96e; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem; }
-.subtitle h1 { font-size: 1.8rem; color: #e8dcc8; font-weight: normal; }
-.subtitle p { color: #8aa0b8; font-size: 0.85rem; margin-top: 0.5rem; }
-.doc-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
-.doc-type-btn { background: #111e2e; border: 1px solid #1e3048; border-radius: 10px; padding: 1rem 0.75rem; cursor: pointer; text-align: center; transition: all 0.2s; color: #8aa0b8; }
-.doc-type-btn.active { background: linear-gradient(135deg, #1a3a5c, #254d7a); border-color: #c8a96e; color: #c8a96e; }
-.doc-type-btn .icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
-.doc-type-btn .label { font-size: 0.7rem; line-height: 1.3; font-family: inherit; }
-.form-card { background: #111e2e; border: 1px solid #1e3048; border-radius: 14px; padding: 1.75rem; margin-bottom: 1.5rem; }
-.form-title { margin: 0 0 1.25rem; font-size: 1rem; color: #c8a96e; font-weight: normal; letter-spacing: 0.05em; }
-.form-fields { display: flex; flex-direction: column; gap: 1rem; }
-.field label { display: block; font-size: 0.75rem; color: #8aa0b8; margin-bottom: 0.4rem; letter-spacing: 0.08em; text-transform: uppercase; }
-.field input, .field textarea { width: 100%; background: #0d1b2a; border: 1px solid #2a4a6a; border-radius: 8px; padding: 0.65rem 0.85rem; color: #e8dcc8; font-family: inherit; font-size: 0.85rem; outline: none; }
-.field textarea { resize: vertical; }
-.error { margin-top: 1rem; color: #e07070; font-size: 0.8rem; background: #2a1515; border-radius: 8px; padding: 0.65rem 0.85rem; border: 1px solid #5a2020; }
-.generate-btn { margin-top: 1.5rem; width: 100%; background: linear-gradient(135deg, #c8a96e, #e8c97e); color: #0d1b2a; border: none; border-radius: 10px; padding: 0.9rem; font-size: 0.9rem; font-family: inherit; font-weight: bold; cursor: pointer; letter-spacing: 0.08em; transition: all 0.2s; }
-.generate-btn:disabled { background: #1a3a5c; color: #8aa0b8; cursor: not-allowed; }
-.result-card { background: #111e2e; border: 1px solid #c8a96e44; border-radius: 14px; padding: 1.75rem; }
-.result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
-.result-label { color: #c8a96e; font-size: 0.85rem; letter-spacing: 0.08em; }
-.result-actions { display: flex; gap: 0.5rem; }
-.copy-btn, .new-btn { border-radius: 7px; padding: 0.4rem 0.9rem; cursor: pointer; font-size: 0.75rem; font-family: inherit; }
-.copy-btn { background: #1a3a5c; color: #c8a96e; border: 1px solid #c8a96e44; }
-.copy-btn.copied { background: #2d6a4f; color: #7ed4a0; border-color: #2d6a4f; }
-.new-btn { background: transparent; color: #8aa0b8; border: 1px solid #2a4a6a; }
-.result-doc { background: #fafaf5; color: #1a1a1a; border-radius: 10px; padding: 1.5rem; font-size: 0.82rem; line-height: 1.9; white-space: pre-wrap; font-family: Georgia, serif; max-height: 520px; overflow-y: auto; border: 1px solid #e0d8c8; }
-.result-disclaimer { margin-top: 1rem; font-size: 0.7rem; color: #4a6a8a; font-style: italic; }
-.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-.plan-card { background: #111e2e; border: 1px solid #1e3048; border-radius: 14px; padding: 1.75rem; text-align: center; position: relative; }
-.plan-card.popular { background: linear-gradient(160deg, #1a3a5c, #254d7a); border-color: #c8a96e; }
-.popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #c8a96e; color: #0d1b2a; font-size: 0.65rem; padding: 0.25rem 0.9rem; border-radius: 20px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; }
-.plan-name { font-size: 0.75rem; color: #8aa0b8; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem; }
-.plan-price { font-size: 2rem; color: #c8a96e; font-weight: bold; margin-bottom: 0.25rem; }
-.plan-period { font-size: 0.7rem; color: #8aa0b8; margin-bottom: 1.5rem; }
-.plan-features { font-size: 0.82rem; color: #e8dcc8; margin-bottom: 1.75rem; line-height: 1.6; }
-.plan-btn { width: 100%; background: transparent; color: #c8a96e; border: 1px solid #c8a96e; border-radius: 9px; padding: 0.75rem; cursor: pointer; font-family: inherit; font-size: 0.82rem; letter-spacing: 0.05em; }
-.plan-btn.popular { background: linear-gradient(135deg, #c8a96e, #e8c97e); color: #0d1b2a; font-weight: bold; }
-.pricing-note { text-align: center; margin-top: 2rem; color: #4a6a8a; font-size: 0.75rem; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LexDraft PH – AI Legal Document Generator</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d1b2a; font-family: Georgia, 'Times New Roman', serif; color: #e8dcc8; min-height: 100vh; }
+    .header { background: linear-gradient(135deg, #0d1b2a 0%, #1a3a5c 50%, #0d1b2a 100%); border-bottom: 1px solid #c8a96e33; padding: 0 2rem; }
+    .header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 0 0.8rem; }
+    .logo { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #c8a96e, #e8c97e); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; color: #0d1b2a; }
+    .logo-name { font-size: 1.15rem; font-weight: bold; color: #c8a96e; letter-spacing: 0.05em; }
+    .logo-sub { font-size: 0.65rem; color: #8aa0b8; letter-spacing: 0.12em; text-transform: uppercase; }
+    .nav { display: flex; gap: 0.25rem; }
+    .nav-btn { background: transparent; color: #8aa0b8; border: 1px solid #2a4a6a; border-radius: 6px; padding: 0.4rem 1rem; cursor: pointer; font-size: 0.8rem; font-family: inherit; text-transform: capitalize; letter-spacing: 0.05em; transition: all 0.2s; }
+    .nav-btn.active { background: #c8a96e; color: #0d1b2a; border-color: #c8a96e; }
+    .main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .subtitle { text-align: center; margin-bottom: 2rem; }
+    .subtitle-tag { font-size: 0.75rem; color: #c8a96e; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .subtitle h1 { font-size: 1.8rem; color: #e8dcc8; font-weight: normal; }
+    .subtitle p { color: #8aa0b8; font-size: 0.85rem; margin-top: 0.5rem; }
+    .doc-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
+    .doc-type-btn { background: #111e2e; border: 1px solid #1e3048; border-radius: 10px; padding: 1rem 0.75rem; cursor: pointer; text-align: center; transition: all 0.2s; color: #8aa0b8; }
+    .doc-type-btn.active { background: linear-gradient(135deg, #1a3a5c, #254d7a); border-color: #c8a96e; color: #c8a96e; }
+    .doc-type-btn .icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+    .doc-type-btn .label { font-size: 0.7rem; line-height: 1.3; font-family: inherit; }
+    .form-card { background: #111e2e; border: 1px solid #1e3048; border-radius: 14px; padding: 1.75rem; margin-bottom: 1.5rem; }
+    .form-title { margin: 0 0 1.25rem; font-size: 1rem; color: #c8a96e; font-weight: normal; letter-spacing: 0.05em; }
+    .form-fields { display: flex; flex-direction: column; gap: 1rem; }
+    .field label { display: block; font-size: 0.75rem; color: #8aa0b8; margin-bottom: 0.4rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .field input, .field textarea { width: 100%; background: #0d1b2a; border: 1px solid #2a4a6a; border-radius: 8px; padding: 0.65rem 0.85rem; color: #e8dcc8; font-family: inherit; font-size: 0.85rem; outline: none; }
+    .field textarea { resize: vertical; }
+    .error { margin-top: 1rem; color: #e07070; font-size: 0.8rem; background: #2a1515; border-radius: 8px; padding: 0.65rem 0.85rem; border: 1px solid #5a2020; }
+    .generate-btn { margin-top: 1.5rem; width: 100%; background: linear-gradient(135deg, #c8a96e, #e8c97e); color: #0d1b2a; border: none; border-radius: 10px; padding: 0.9rem; font-size: 0.9rem; font-family: inherit; font-weight: bold; cursor: pointer; letter-spacing: 0.08em; transition: all 0.2s; }
+    .generate-btn:disabled { background: #1a3a5c; color: #8aa0b8; cursor: not-allowed; }
+    .result-card { background: #111e2e; border: 1px solid #c8a96e44; border-radius: 14px; padding: 1.75rem; }
+    .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .result-label { color: #c8a96e; font-size: 0.85rem; letter-spacing: 0.08em; }
+    .result-actions { display: flex; gap: 0.5rem; }
+    .copy-btn, .new-btn { border-radius: 7px; padding: 0.4rem 0.9rem; cursor: pointer; font-size: 0.75rem; font-family: inherit; }
+    .copy-btn { background: #1a3a5c; color: #c8a96e; border: 1px solid #c8a96e44; }
+    .copy-btn.copied { background: #2d6a4f; color: #7ed4a0; border-color: #2d6a4f; }
+    .new-btn { background: transparent; color: #8aa0b8; border: 1px solid #2a4a6a; }
+    .result-doc { background: #fafaf5; color: #1a1a1a; border-radius: 10px; padding: 1.5rem; font-size: 0.82rem; line-height: 1.9; white-space: pre-wrap; font-family: Georgia, serif; max-height: 520px; overflow-y: auto; border: 1px solid #e0d8c8; }
+    .result-disclaimer { margin-top: 1rem; font-size: 0.7rem; color: #4a6a8a; font-style: italic; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .plan-card { background: #111e2e; border: 1px solid #1e3048; border-radius: 14px; padding: 1.75rem; text-align: center; position: relative; }
+    .plan-card.popular { background: linear-gradient(160deg, #1a3a5c, #254d7a); border-color: #c8a96e; }
+    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #c8a96e; color: #0d1b2a; font-size: 0.65rem; padding: 0.25rem 0.9rem; border-radius: 20px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; }
+    .plan-name { font-size: 0.75rem; color: #8aa0b8; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .plan-price { font-size: 2rem; color: #c8a96e; font-weight: bold; margin-bottom: 0.25rem; }
+    .plan-period { font-size: 0.7rem; color: #8aa0b8; margin-bottom: 1.5rem; }
+    .plan-features { font-size: 0.82rem; color: #e8dcc8; margin-bottom: 1.75rem; line-height: 1.6; }
+    .plan-btn { width: 100%; background: transparent; color: #c8a96e; border: 1px solid #c8a96e; border-radius: 9px; padding: 0.75rem; cursor: pointer; font-family: inherit; font-size: 0.82rem; letter-spacing: 0.05em; }
+    .plan-btn.popular { background: linear-gradient(135deg, #c8a96e, #e8c97e); color: #0d1b2a; font-weight: bold; }
+    .pricing-note { text-align: center; margin-top: 2rem; color: #4a6a8a; font-size: 0.75rem; }
+  </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-const { useState } = React;
-const DOCS = {
-contract: { label: "Contract & Agreement", icon: "⚖️", fields: [
-{ id: "parties", label: "Parties Involved", placeholder: "e.g. Juan dela Cruz and ABC Corporation", type: "text" },
-{ id: "subject", label: "Subject / Purpose", placeholder: "e.g. Sale of real property located at...", type: "text" },
-{ id: "amount", label: "Amount / Consideration", placeholder: "e.g. PHP 1,500,000.00", type: "text" },
-{ id: "terms", label: "Key Terms & Conditions", placeholder: "e.g. Payment in 3 installments...", type: "textarea" },
-{ id: "date", label: "Date of Execution", placeholder: "e.g. April 25, 2026", type: "text" }],
-prompt: (f) => `Draft a formal Philippine Contract and Agreement. Parties: ${f.parties}. Subject: ${f.subject}. Consideration: ${f.amount}. Terms: ${f.terms}. Date: ${f.date}. Use proper Philippine legal format with recitals, operative provisions, obligations, breach and remedies, governing law, dispute resolution, and signature block.`},
-affidavit: { label: "Affidavit", icon: "📜", fields: [
-{ id: "affiant", label: "Affiant (Full Name)", placeholder: "e.g. Maria Santos, Filipino, of legal age", type: "text" },
-{ id: "address", label: "Address of Affiant", placeholder: "e.g. 123 Rizal Street, Quezon City", type: "text" },
-{ id: "facts", label: "Facts to be Attested", placeholder: "Describe the facts...", type: "textarea" },
-{ id: "purpose", label: "Purpose of Affidavit", placeholder: "e.g. To attest to the loss of original document...", type: "text" },
-{ id: "date", label: "Date", placeholder: "e.g. April 25, 2026", type: "text" }],
-prompt: (f) => `Draft a formal Philippine Affidavit. Affiant: ${f.affiant}. Address: ${f.address}. Facts: ${f.facts}. Purpose: ${f.purpose}. Date: ${f.date}. Follow the 2004 Rules on Notarial Practice. Include proper jurat, numbered paragraphs, attestation clause, and signature lines.`},
-demand: { label: "Demand Letter", icon: "✉️", fields: [
-{ id: "sender", label: "Sender", placeholder: "e.g. Atty. Jose Reyes on behalf of XYZ Corp.", type: "text" },
-{ id: "recipient", label: "Recipient", placeholder: "e.g. Mr. Pedro Gomez", type: "text" },
-{ id: "claim", label: "Nature of Claim", placeholder: "e.g. Unpaid balance of PHP 250,000", type: "text" },
-{ id: "deadline", label: "Deadline to Comply", placeholder: "e.g. 15 days from receipt", type: "text" },
-{ id: "consequences", label: "Consequences if Ignored", placeholder: "e.g. Filing of civil and/or criminal case", type: "text" }],
-prompt: (f) => `Draft a formal Philippine Demand Letter. Sender: ${f.sender}. Recipient: ${f.recipient}. Claim: ${f.claim}. Deadline: ${f.deadline}. Consequences: ${f.consequences}. Include background facts, specific demand, legal basis, and signature block.`},
-notice: { label: "Legal Notice", icon: "📋", fields: [
-{ id: "issuer", label: "Issuing Party", placeholder: "e.g. ABC Realty Corporation", type: "text" },
-{ id: "recipient", label: "Recipient", placeholder: "e.g. Mr. Juan dela Cruz, tenant", type: "text" },
-{ id: "noticeType", label: "Type of Notice", placeholder: "e.g. Notice to Vacate", type: "text" },
-{ id: "details", label: "Details / Grounds", placeholder: "Explain the basis...", type: "textarea" },
-{ id: "date", label: "Date", placeholder: "e.g. April 25, 2026", type: "text" }],
-prompt: (f) => `Draft a formal Philippine Legal Notice. Issuing Party: ${f.issuer}. Recipient: ${f.recipient}. Type: ${f.noticeType}. Details: ${f.details}. Date: ${f.date}. Include title, formal address, numbered grounds, legal basis, required action, consequences, and signature block.`}
-};
-const PLANS = [
-{ name: "Starter", price: "₱999", docs: "10 documents/mo", popular: false },
-{ name: "Professional", price: "₱2,499", docs: "Unlimited documents", popular: true },
-{ name: "Firm", price: "₱5,999", docs: "Unlimited + 5 users", popular: false }
-];
-function App() {
-const [tab, setTab] = useState("generate");
-const [docType, setDocType] = useState("contract");
-const [fields, setFields] = useState({});
-const [loading, setLoading] = useState(false);
-const [result, setResult] = useState("");
-const [error, setError] = useState("");
-const [copied, setCopied] = useState(false);
-const doc = DOCS[docType];
-const handleField = (id, val) => setFields(p => ({ ...p, [id]: val }));
-const generate = async () => {
-const missing = doc.fields.filter(f => !fields[f.id]?.trim());
-if (missing.length) { setError(`Please fill in: ${missing.map(f => f.label).join(", ")}`); return; }
-setError(""); setLoading(true); setResult("");
-try {
-const res = await fetch("https://api.anthropic.com/v1/messages", {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000,
-system: "You are an expert Philippine lawyer. Draft precise, formal, legally sound documents. Output only the document itself.",
-messages: [{ role: "user", content: doc.prompt(fields) }] }) });
-const data = await res.json();
-setResult(data.content?.map(b => b.text || "").join("\n") || "No response received.");
-} catch (e) { setError("Failed to generate. Please try again."); }
-setLoading(false); };
-const copy = () => { navigator.clipboard.writeText(result); setCopied(true); setTimeout(() => setCopied(false), 2000); };
-const reset = () => { setResult(""); setFields({}); setError(""); };
-return (
-<div>
-<div className="header"><div className="header-inner">
-<div className="logo"><div className="logo-icon">L</div>
-<div><div className="logo-name">LexDraft PH</div><div className="logo-sub">AI Legal Document Generator</div></div></div>
-<div className="nav">
-<button className={`nav-btn ${tab==="generate"?"active":""}`} onClick={()=>setTab("generate")}>Generate</button>
-<button className={`nav-btn ${tab==="pricing"?"active":""}`} onClick={()=>setTab("pricing")}>Pricing</button>
-</div></div></div>
-<div className="main">
-{tab==="generate" && <div>
-<div className="subtitle"><div className="subtitle-tag">Powered by Claude AI</div>
-<h1>Draft Legal Documents in Seconds</h1><p>Philippine law — precise, formal, ready to use</p></div>
-<div className="doc-types">{Object.entries(DOCS).map(([key,d])=>(
-<button key={key} className={`doc-type-btn ${docType===key?"active":""}`}
-onClick={()=>{setDocType(key);setResult("");setFields({});setError("");}}>
-<div className="icon">{d.icon}</div><div className="label">{d.label}</div></button>))}</div>
-{!result && <div className="form-card"><h2 className="form-title">{doc.icon} {doc.label} Details</h2>
-<div className="form-fields">{doc.fields.map(f=>(
-<div key={f.id} className="field"><label>{f.label}</label>
-{f.type==="textarea"?<textarea value={fields[f.id]||""} onChange={e=>handleField(f.id,e.target.value)} placeholder={f.placeholder} rows={3}/>
-:<input type="text" value={fields[f.id]||""} onChange={e=>handleField(f.id,e.target.value)} placeholder={f.placeholder}/>}
-</div>))}</div>
-{error&&<div className="error">⚠️ {error}</div>}
-<button className="generate-btn" onClick={generate} disabled={loading}>
-{loading?"⚖️ Drafting your document...":"✦ Generate Document"}</button></div>}
-{result && <div className="result-card">
-<div className="result-header"><div className="result-label">✦ Document Generated</div>
-<div className="result-actions">
-<button className={`copy-btn ${copied?"copied":""}`} onClick={copy}>{copied?"✓ Copied!":"Copy"}</button>
-<button className="new-btn" onClick={reset}>New Document</button></div></div>
-<div className="result-doc">{result}</div>
-<div className="result-disclaimer">⚠ AI-generated draft. Always review with a licensed Philippine attorney before use.</div>
-</div>}</div>}
-{tab==="pricing" && <div>
-<div className="subtitle"><div className="subtitle-tag">Simple Pricing</div>
-<h1>Plans for Every Firm</h1><p>Cancel anytime. No hidden fees.</p></div>
-<div className="pricing-grid">{PLANS.map(plan=>(
-<div key={plan.name} className={`plan-card ${plan.popular?"popular":""}`}>
-{plan.popular&&<div className="popular-badge">Most Popular</div>}
-<div className="plan-name">{plan.name}</div>
-<div className="plan-price">{plan.price}</div>
-<div className="plan-period">per month</div>
-<div className="plan-features">{plan.docs}<br/>All 4 document types<br/>Export to Word / PDF<br/>{plan.name==="Firm"?"Team management":"Single user"}</div>
-<button className={`plan-btn ${plan.popular?"popular":""}`}>Get Started</button>
-</div>))}</div>
-<div className="pricing-note">All plans include a 7-day free trial · Secure payment via GCash, Maya, or credit card</div>
-</div>}
-</div></div>); }
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
-</script>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const DOCS = {
+      contract: {
+        label: "Contract & Agreement", icon: "⚖️",
+        fields: [
+          { id: "parties", label: "Parties Involved", placeholder: "e.g. Juan dela Cruz and ABC Corporation", type: "text" },
+          { id: "subject", label: "Subject / Purpose", placeholder: "e.g. Sale of real property located at...", type: "text" },
+          { id: "amount", label: "Amount / Consideration", placeholder: "e.g. PHP 1,500,000.00", type: "text" },
+          { id: "terms", label: "Key Terms & Conditions", placeholder: "e.g. Payment in 3 installments...", type: "textarea" },
+          { id: "date", label: "Date of Execution", placeholder: "e.g. April 25, 2026", type: "text" },
+        ],
+        prompt: (f) => `Draft a formal Philippine Contract and Agreement. Parties: ${f.parties}. Subject: ${f.subject}. Consideration: ${f.amount}. Terms: ${f.terms}. Date: ${f.date}. Use proper Philippine legal format with recitals, operative provisions, obligations, breach and remedies, governing law, dispute resolution, and signature block.`
+      },
+      affidavit: {
+        label: "Affidavit", icon: "📜",
+        fields: [
+          { id: "affiant", label: "Affiant (Full Name)", placeholder: "e.g. Maria Santos, Filipino, of legal age", type: "text" },
+          { id: "address", label: "Address of Affiant", placeholder: "e.g. 123 Rizal Street, Quezon City", type: "text" },
+          { id: "facts", label: "Facts to be Attested", placeholder: "Describe the facts...", type: "textarea" },
+          { id: "purpose", label: "Purpose of Affidavit", placeholder: "e.g. To attest to the loss of original document...", type: "text" },
+          { id: "date", label: "Date", placeholder: "e.g. April 25, 2026", type: "text" },
+        ],
+        prompt: (f) => `Draft a formal Philippine Affidavit. Affiant: ${f.affiant}. Address: ${f.address}. Facts: ${f.facts}. Purpose: ${f.purpose}. Date: ${f.date}. Follow the 2004 Rules on Notarial Practice. Include proper jurat, numbered paragraphs, attestation clause, and signature lines.`
+      },
+      demand: {
+        label: "Demand Letter", icon: "✉️",
+        fields: [
+          { id: "sender", label: "Sender", placeholder: "e.g. Atty. Jose Reyes on behalf of XYZ Corp.", type: "text" },
+          { id: "recipient", label: "Recipient", placeholder: "e.g. Mr. Pedro Gomez", type: "text" },
+          { id: "claim", label: "Nature of Claim", placeholder: "e.g. Unpaid balance of PHP 250,000", type: "text" },
+          { id: "deadline", label: "Deadline to Comply", placeholder: "e.g. 15 days from receipt", type: "text" },
+          { id: "consequences", label: "Consequences if Ignored", placeholder: "e.g. Filing of civil and/or criminal case", type: "text" },
+        ],
+        prompt: (f) => `Draft a formal Philippine Demand Letter. Sender: ${f.sender}. Recipient: ${f.recipient}. Claim: ${f.claim}. Deadline: ${f.deadline}. Consequences: ${f.consequences}. Include background facts, specific demand, legal basis, and signature block.`
+      },
+      notice: {
+        label: "Legal Notice", icon: "📋",
+        fields: [
+          { id: "issuer", label: "Issuing Party", placeholder: "e.g. ABC Realty Corporation", type: "text" },
+          { id: "recipient", label: "Recipient", placeholder: "e.g. Mr. Juan dela Cruz, tenant", type: "text" },
+          { id: "noticeType", label: "Type of Notice", placeholder: "e.g. Notice to Vacate", type: "text" },
+          { id: "details", label: "Details / Grounds", placeholder: "Explain the basis...", type: "textarea" },
+          { id: "date", label: "Date", placeholder: "e.g. April 25, 2026", type: "text" },
+        ],
+        prompt: (f) => `Draft a formal Philippine Legal Notice. Issuing Party: ${f.issuer}. Recipient: ${f.recipient}. Type: ${f.noticeType}. Details: ${f.details}. Date: ${f.date}. Include title, formal address, numbered grounds, legal basis, required action, consequences, and signature block.`
+      }
+    };
+
+    const PLANS = [
+      { name: "Starter", price: "₱999", docs: "10 documents/mo", popular: false },
+      { name: "Professional", price: "₱2,499", docs: "Unlimited documents", popular: true },
+      { name: "Firm", price: "₱5,999", docs: "Unlimited + 5 users", popular: false },
+    ];
+
+    function App() {
+      const [tab, setTab] = useState("generate");
+      const [docType, setDocType] = useState("contract");
+      const [fields, setFields] = useState({});
+      const [loading, setLoading] = useState(false);
+      const [result, setResult] = useState("");
+      const [error, setError] = useState("");
+      const [copied, setCopied] = useState(false);
+
+      const doc = DOCS[docType];
+
+      const handleField = (id, val) => setFields(p => ({ ...p, [id]: val }));
+
+      const generate = async () => {
+        const missing = doc.fields.filter(f => !fields[f.id]?.trim());
+        if (missing.length) { setError(`Please fill in: ${missing.map(f => f.label).join(", ")}`); return; }
+        setError(""); setLoading(true); setResult("");
+        try {
+          const res = await fetch("/api/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "claude-sonnet-4-20250514",
+              max_tokens: 1000,
+              system: "You are an expert Philippine lawyer with 20 years of experience. Draft precise, formal, legally sound documents under Philippine law. Output only the document itself — no explanations or preamble.",
+              messages: [{ role: "user", content: doc.prompt(fields) }]
+            })
+          });
+          const data = await res.json();
+          setResult(data.content?.map(b => b.text || "").join("\n") || "No response received.");
+        } catch (e) { setError("Failed to generate. Please try again."); }
+        setLoading(false);
+      };
+
+      const copy = () => { navigator.clipboard.writeText(result); setCopied(true); setTimeout(() => setCopied(false), 2000); };
+      const reset = () => { setResult(""); setFields({}); setError(""); };
+
+      return (
+        <div>
+          <div className="header">
+            <div className="header-inner">
+              <div className="logo">
+                <div className="logo-icon">L</div>
+                <div>
+                  <div className="logo-name">LexDraft PH</div>
+                  <div className="logo-sub">AI Legal Document Generator</div>
+                </div>
+              </div>
+              <div className="nav">
+                <button className={`nav-btn ${tab === "generate" ? "active" : ""}`} onClick={() => setTab("generate")}>Generate</button>
+                <button className={`nav-btn ${tab === "pricing" ? "active" : ""}`} onClick={() => setTab("pricing")}>Pricing</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="main">
+            {tab === "generate" && (
+              <div>
+                <div className="subtitle">
+                  <div className="subtitle-tag">Powered by Claude AI</div>
+                  <h1>Draft Legal Documents in Seconds</h1>
+                  <p>Philippine law — precise, formal, ready to use</p>
+                </div>
+
+                <div className="doc-types">
+                  {Object.entries(DOCS).map(([key, d]) => (
+                    <button key={key} className={`doc-type-btn ${docType === key ? "active" : ""}`}
+                      onClick={() => { setDocType(key); setResult(""); setFields({}); setError(""); }}>
+                      <div className="icon">{d.icon}</div>
+                      <div className="label">{d.label}</div>
+                    </button>
+                  ))}
+                </div>
+
+                {!result && (
+                  <div className="form-card">
+                    <h2 className="form-title">{doc.icon} {doc.label} Details</h2>
+                    <div className="form-fields">
+                      {doc.fields.map(f => (
+                        <div key={f.id} className="field">
+                          <label>{f.label}</label>
+                          {f.type === "textarea"
+                            ? <textarea value={fields[f.id] || ""} onChange={e => handleField(f.id, e.target.value)} placeholder={f.placeholder} rows={3} />
+                            : <input type="text" value={fields[f.id] || ""} onChange={e => handleField(f.id, e.target.value)} placeholder={f.placeholder} />
+                          }
+                        </div>
+                      ))}
+                    </div>
+                    {error && <div className="error">⚠️ {error}</div>}
+                    <button className="generate-btn" onClick={generate} disabled={loading}>
+                      {loading ? "⚖️ Drafting your document..." : "✦ Generate Document"}
+                    </button>
+                  </div>
+                )}
+
+                {result && (
+                  <div className="result-card">
+                    <div className="result-header">
+                      <div className="result-label">✦ Document Generated</div>
+                      <div className="result-actions">
+                        <button className={`copy-btn ${copied ? "copied" : ""}`} onClick={copy}>{copied ? "✓ Copied!" : "Copy"}</button>
+                        <button className="new-btn" onClick={reset}>New Document</button>
+                      </div>
+                    </div>
+                    <div className="result-doc">{result}</div>
+                    <div className="result-disclaimer">⚠ AI-generated draft. Always review with a licensed Philippine attorney before use.</div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {tab === "pricing" && (
+              <div>
+                <div className="subtitle">
+                  <div className="subtitle-tag">Simple Pricing</div>
+                  <h1>Plans for Every Firm</h1>
+                  <p>Cancel anytime. No hidden fees.</p>
+                </div>
+                <div className="pricing-grid">
+                  {PLANS.map(plan => (
+                    <div key={plan.name} className={`plan-card ${plan.popular ? "popular" : ""}`}>
+                      {plan.popular && <div className="popular-badge">Most Popular</div>}
+                      <div className="plan-name">{plan.name}</div>
+                      <div className="plan-price">{plan.price}</div>
+                      <div className="plan-period">per month</div>
+                      <div className="plan-features">{plan.docs}<br />All 4 document types<br />Export to Word / PDF<br />{plan.name === "Firm" ? "Team management" : "Single user"}</div>
+                      <button className={`plan-btn ${plan.popular ? "popular" : ""}`}>Get Started</button>
+                    </div>
+                  ))}
+                </div>
+                <div className="pricing-note">All plans include a 7-day free trial · Secure payment via GCash, Maya, or credit card</div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
 </body>
 </html>
