@@ -148,8 +148,8 @@
             })
           });
           const data = await res.json();
-          setResult(data.content?.map(b => b.text || "").join("\n") || "No response received.");
-        } catch (e) { setError("Failed to generate. Please try again."); }
+          const text = data.content && data.content.length > 0 ? data.content.map(b => b.text || "").join("\n") : (data.error ? "Error: " + data.error : "No response received.");
+setResult(text);        } catch (e) { setError("Failed to generate. Please try again."); }
         setLoading(false);
       };
 
